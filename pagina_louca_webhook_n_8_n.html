@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abrir OS DBM</title>
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --accent: #00ffd9;
+      --accent2: #ff00e0;
+      --txt: #e8f6ff;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--txt);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+      background: var(--bg);
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 18px 120px;
+      position: relative;
+    }
+
+    .title {
+      font-size: clamp(28px, 6vw, 64px);
+      line-height: 1;
+      margin: 8px 0 4px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: .9
+    }
+
+    .subtitle {
+      margin: 0 0 12px;
+      opacity: .8;
+      font-size: 14px
+    }
+
+    /* HERO — botão centralizado */
+    .hero {
+      min-height: calc(100vh - 200px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .bigBtn {
+      font-size: clamp(18px, 3.5vw, 28px);
+      padding: 18px 32px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      background: rgba(255, 255, 255, .06);
+      color: var(--txt);
+      font-weight: 800;
+      letter-spacing: .3px;
+      cursor: pointer;
+      transition: transform .04s ease, filter .3s ease, background .2s;
+      filter: drop-shadow(0 0 12px rgba(0, 255, 217, .35)) drop-shadow(0 0 26px rgba(255, 0, 224, .18));
+    }
+
+    .bigBtn:hover {
+      background: rgba(255, 255, 255, .09);
+    }
+
+    .bigBtn:active {
+      transform: translateY(1px) scale(.995)
+    }
+
+    .bigBtn .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, .6);
+      border-top-color: transparent;
+      border-radius: 50%;
+      display: inline-block;
+      vertical-align: -3px;
+      margin-right: 8px;
+      animation: spin 900ms linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Painéis avançados recolhidos */
+    details.panel {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      background: rgba(255, 255, 255, .05);
+      padding: 10px 12px;
+    }
+
+    details.panel>summary {
+      cursor: pointer;
+      font-weight: 700;
+      margin: 2px 0 8px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 920px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panelBox {
+      backdrop-filter: blur(6px);
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 10px 36px rgba(0, 0, 0, .35);
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .row>* {
+      flex: none;
+    }
+
+    textarea,
+    input[type="text"] {
+      width: 100%;
+      min-height: 72px;
+      resize: vertical;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, .06);
+      color: var(--txt);
+      font-size: 14px;
+      outline: none;
+    }
+
+    textarea.small {
+      min-height: 44px;
+    }
+
+    textarea::placeholder {
+      color: rgba(232, 246, 255, .6)
+    }
+
+    select,
+    button,
+    input[type="text"],
+    input[type="checkbox"] {
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      background: rgba(255, 255, 255, .08);
+      color: var(--txt);
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    button.std {
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: .4px;
+      transition: transform .04s ease;
+    }
+
+    button.std:active {
+      transform: translateY(1px) scale(.995)
+    }
+
+    .muted {
+      opacity: .8;
+      font-size: 12px
+    }
+
+    #status {
+      font-size: 12px;
+      opacity: .95;
+      margin-top: 6px;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: rgba(0, 0, 0, .5);
+      border: 1px solid rgba(255, 255, 255, .12);
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 8px;
+      max-height: 40vh;
+      overflow: auto;
+    }
+
+    code.inline {
+      background: rgba(0, 0, 0, .45);
+      padding: .2em .4em;
+      border-radius: .4em;
+      border: 1px solid rgba(255, 255, 255, .12)
+    }
+
+    .floating {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .overlay-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 11;
+    }
+
+    .matrix {
+      position: fixed;
+      inset: 0;
+      z-index: 9;
+      pointer-events: none;
+      background: transparent;
+    }
+
+    .emoji {
+      position: absolute;
+      font-size: 24px;
+      will-change: transform, opacity;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .6));
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1 class="title" id="title" data-text="PÁGINA LOUCA">Dbm Alterado</h1>
+    <p class="subtitle">Aperte o botão para iniciar a abertura</p>
+
+    <!-- Botão centralizado -->
+    <section class="hero">
+      <button id="heroGo" class="bigBtn" aria-label="Abrir OS dbm alterado">Abrir OS dbm alterado</button>
+    </section>
+
+    <!-- Opções avançadas ficam recolhidas -->
+    <details class="panel">
+      <summary>Opções avançadas (diagnóstico CORS, payload, headers, testes)</summary>
+      <div class="grid">
+        <div class="panelBox controls">
+          <label for="payload">Payload opcional (JSON ou texto). Dica: envie {"ok":true} para testar.</label>
+          <textarea id="payload" placeholder='Ex.: {"mensagem":"oi n8n"}'></textarea>
+
+          <div class="row">
+            <label for="method">Método:</label>
+            <select id="method" aria-label="HTTP method">
+              <option value="POST" selected>POST</option>
+              <option value="GET">GET</option>
+            </select>
+            <label for="mode">Modo de envio:</label>
+            <select id="mode" aria-label="Modo de envio">
+              <option value="direct" selected>Direto (fetch/CORS)</option>
+              <option value="img">Ping IMG (GET)</option>
+              <option value="iframe">Form POST (iframe)</option>
+              <option value="proxy">Proxy (demo)</option>
+            </select>
+            <label class="muted"><input type="checkbox" id="openNew"> Abrir GET em nova aba</label>
+          </div>
+
+          <div class="row" id="proxyRow" style="display:none">
+            <label for="proxy">Proxy:</label>
+            <input id="proxy" type="text" value="https://cors.isomorphic-git.org/"
+              placeholder="Prefixo do proxy (use com cautela)">
+            <span class="muted">Usado apenas no modo <code class="inline">Proxy</code> (ex.: <code
+                class="inline">https://cors.isomorphic-git.org/</code>).</span>
+          </div>
+
+          <label for="headers">Headers adicionais (JSON). Ex.: {"Authorization":"Bearer XXX"}</label>
+          <textarea id="headers" class="small" placeholder='{}'></textarea>
+
+          <div class="row">
+            <button id="go" class="std">Abrir OS dbm alterado</button>
+            <button id="copyCurl" class="std" title="Gerar cURL equivalente">📋 cURL</button>
+            <button id="simulate" class="std" title="Simula sucesso sem rede">🧪 Simular Sucesso</button>
+          </div>
+
+          <div id="status">Pronto.</div>
+          <pre id="response" aria-live="polite"></pre>
+          <p class="muted">Para ler a resposta no navegador, seu n8n precisa enviar
+            <code>Access-Control-Allow-Origin: *</code> (ou o domínio da sua página). O modo <em>Proxy</em> é só para
+            testes.
+          </p>
+        </div>
+
+        <div class="panelBox">
+          <h3 style="margin:6px 0 8px">Diagnóstico & Testes</h3>
+          <p class="muted">Testes para diferenciar rede vs CORS.</p>
+          <div class="row">
+            <button id="runTests" class="std">▶️ Rodar Testes</button>
+            <span class="muted">Inclui GET/POST (jsonplaceholder) e uma checagem do seu webhook.</span>
+          </div>
+          <pre id="testsOut">(sem testes ainda)</pre>
+          <ul class="muted" style="margin-top:8px">
+            <li>Use <strong>Respond to Webhook</strong> com <code>Content-Type: application/json</code>.</li>
+            <li>Adicione <code>Access-Control-Allow-Origin: *</code> e, se preciso,
+              <code>Access-Control-Allow-Headers: *</code>.
+            </li>
+            <li>Responda <code>OPTIONS</code> com <code>200</code> +
+              <code>Access-Control-Allow-Methods: GET,POST,OPTIONS</code>.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <canvas id="overlay" class="overlay-canvas"></canvas>
+  <canvas id="matrix" class="matrix"></canvas>
+  <div id="floatLayer" class="floating"></div>
+
+  <script>
+    (() => {
+      // === CONFIG ===
+      const WEBHOOK_URL = 'https://n8n.mov.pro.br/webhook/marianaaaa';
+      const HERO = document.getElementById('heroGo');
+      const BTN = document.getElementById('go');
+      const STATUS = document.getElementById('status');
+      const RESP = document.getElementById('response');
+      const PAYLOAD = document.getElementById('payload');
+      const METHOD = document.getElementById('method');
+      const MODE = document.getElementById('mode');
+      const OPEN_NEW = document.getElementById('openNew');
+      const TITLE = document.getElementById('title');
+      const overlay = document.getElementById('overlay');
+      const matrixCanvas = document.getElementById('matrix');
+      const floatLayer = document.getElementById('floatLayer');
+      const HDRS = document.getElementById('headers');
+      const PROXY_ROW = document.getElementById('proxyRow');
+      const PROXY = document.getElementById('proxy');
+      const RUN_TESTS = document.getElementById('runTests');
+      const TESTS_OUT = document.getElementById('testsOut');
+      const COPY_CURL = document.getElementById('copyCurl');
+      const SIMULATE = document.getElementById('simulate');
+
+      if (MODE) MODE.addEventListener('change', () => { PROXY_ROW.style.display = MODE.value === 'proxy' ? '' : 'none'; });
+
+      const ctx = overlay.getContext('2d');
+      const mctx = matrixCanvas.getContext('2d');
+      const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const resize = () => {
+        overlay.width = Math.floor(window.innerWidth * DPR);
+        overlay.height = Math.floor(window.innerHeight * DPR);
+        overlay.style.width = window.innerWidth + 'px';
+        overlay.style.height = window.innerHeight + 'px';
+        matrixCanvas.width = overlay.width;
+        matrixCanvas.height = overlay.height;
+        matrixCanvas.style.width = overlay.style.width;
+        matrixCanvas.style.height = overlay.style.height;
+      };
+      resize();
+      addEventListener('resize', resize);
+
+      function setStatus(msg) { if (STATUS) STATUS.textContent = msg; }
+      function looksLikeJSON(str) { if (!str) return false; try { JSON.parse(str); return true; } catch (_) { return false; } }
+      function fmtJSON(text) { try { return JSON.stringify(JSON.parse(text), null, 2); } catch { return text; } }
+      function parseHeadersJSON() { const raw = (HDRS?.value || '').trim(); if (!raw) return {}; try { const obj = JSON.parse(raw); return obj && typeof obj === 'object' ? obj : {}; } catch { return {}; } }
+      function buildURL(base, method, bodyRaw) { let url = base; if (method === 'GET' && bodyRaw) { const q = encodeURIComponent(bodyRaw); url += (url.includes('?') ? '&' : '?') + 'q=' + q; } return url; }
+
+      function enableUI(disabled) { if (BTN) BTN.disabled = disabled; if (HERO) HERO.disabled = disabled; }
+      function setBtnBusy(busy) { const html = busy ? '<span class="spinner"></span>Chamando…' : 'Abrir OS dbm alterado'; if (BTN) BTN.innerHTML = html; if (HERO) HERO.innerHTML = html; }
+
+      async function callWebhook() {
+        const method = METHOD ? METHOD.value : 'POST';
+        const bodyRaw = (PAYLOAD?.value || '').trim();
+        const mode = MODE ? MODE.value : 'direct';
+        const headersExtra = parseHeadersJSON();
+        const url = buildURL(WEBHOOK_URL, method, bodyRaw);
+
+        if (OPEN_NEW && OPEN_NEW.checked && method === 'GET') { window.open(url, '_blank'); }
+
+        setStatus('Preparando…'); enableUI(true); setBtnBusy(true); if (RESP) RESP.textContent = '';
+
+        try {
+          if (mode === 'img') return await callViaImg(url);
+          if (mode === 'iframe') return await callViaIframe(url, method, bodyRaw, headersExtra);
+          if (mode === 'proxy') return await callViaProxy(url, method, bodyRaw, headersExtra);
+          await callDirect(url, method, bodyRaw, headersExtra);
+        } finally { enableUI(false); setBtnBusy(false); }
+      }
+
+      // === Strategies ===
+      async function callDirect(url, method, bodyRaw, headersExtra) {
+        const headers = { ...headersExtra };
+        const opts = { method, headers, mode: 'cors', credentials: 'omit' };
+        if (method !== 'GET' && bodyRaw) { if (looksLikeJSON(bodyRaw)) { headers['Content-Type'] = 'application/json'; opts.body = bodyRaw; } else { headers['Content-Type'] = 'text/plain;charset=utf-8'; opts.body = bodyRaw; } }
+        const controller = new AbortController(); const to = setTimeout(() => controller.abort('timeout'), 12000); opts.signal = controller.signal;
+
+        const t0 = performance.now(); setStatus('Chamando webhook (direto)…');
+        try {
+          const res = await fetch(url, opts);
+          const ms = Math.round(performance.now() - t0);
+          const text = await res.text().catch(() => '');
+          if (RESP) RESP.textContent = text ? fmtJSON(text) : '(sem corpo)';
+          setStatus(`Status: ${res.status} ${res.statusText || ''} • Tempo: ${ms}ms`);
+          if (res.ok && text && text.trim() && !['null', 'undefined'].includes(text.trim().toLowerCase())) randomEffect(); else subtlePulse();
+        } catch (err) {
+          console.error(err);
+          if (method === 'GET') {
+            try { setStatus('Falhou (provável CORS). Tentando ping no-cors…'); await fetch(url + (url.includes('?') ? '&' : '?') + '_nocors_=' + Date.now(), { method: 'GET', mode: 'no-cors' }); if (RESP) RESP.textContent = '(Resposta opaca — no-cors). O servidor provavelmente bloqueou CORS, mas o endpoint respondeu.'; randomEffect(); return; } catch { }
+          }
+          setStatus('Erro ao chamar o webhook (possível CORS ou rede). Veja console.'); if (RESP) RESP.textContent = String(err); shakeScreen();
+        } finally { clearTimeout(to); }
+      }
+
+      async function callViaProxy(url, method, bodyRaw, headersExtra) { const prefix = (PROXY?.value || '').trim(); if (!prefix) { setStatus('Defina o proxy.'); return; } const proxied = prefix + url; setStatus('Chamando via proxy (apenas testes)…'); await callDirect(proxied, method, bodyRaw, headersExtra); }
+
+      async function callViaImg(url) { setStatus('Ping via IMG (GET)…'); return new Promise((resolve) => { const img = new Image(); const done = (ok) => { img.remove(); resolve(); if (RESP) RESP.textContent = ok ? '(IMG carregada — não é possível ler o corpo)' : '(IMG falhou)'; ok ? randomEffect() : subtlePulse(); }; img.onload = () => done(true); img.onerror = () => done(false); img.referrerPolicy = 'no-referrer'; img.src = url + (url.includes('?') ? '&' : '?') + '_img_=' + Date.now(); if (OPEN_NEW && OPEN_NEW.checked) window.open(img.src, '_blank'); }); }
+
+      async function callViaIframe(url, method, bodyRaw, headersExtra) { setStatus('Form POST via iframe…'); return new Promise((resolve) => { const name = 'hidden_iframe_' + Math.random().toString(36).slice(2); const ifr = document.createElement('iframe'); ifr.name = name; ifr.style.display = 'none'; document.body.appendChild(ifr); const form = document.createElement('form'); form.action = url; form.method = method; form.target = name; form.style.display = 'none'; if (bodyRaw) { const input = document.createElement('input'); input.type = 'hidden'; input.name = 'payload'; input.value = bodyRaw; form.appendChild(input); } if (headersExtra && Object.keys(headersExtra).length) { const inputH = document.createElement('input'); inputH.type = 'hidden'; inputH.name = 'x-headers'; inputH.value = JSON.stringify(headersExtra); form.appendChild(inputH); } document.body.appendChild(form); const cleanup = () => { setTimeout(() => { ifr.remove(); form.remove(); }, 500); resolve(); }; ifr.onload = () => { if (RESP) RESP.textContent = '(iframe carregado — corpo não lido no JS)'; randomEffect(); cleanup(); }; ifr.onerror = () => { if (RESP) RESP.textContent = '(iframe erro)'; subtlePulse(); cleanup(); }; form.submit(); if (OPEN_NEW && OPEN_NEW.checked) window.open(url, '_blank'); }); }
+
+      // Ligações de botão
+      if (HERO) HERO.addEventListener('click', callWebhook);
+      if (BTN) BTN.addEventListener('click', callWebhook);
+      if (SIMULATE) SIMULATE.addEventListener('click', () => { if (RESP) RESP.textContent = '(simulado)'; randomEffect(); });
+      if (COPY_CURL) COPY_CURL.addEventListener('click', () => { const method = METHOD ? METHOD.value : 'POST'; const bodyRaw = (PAYLOAD?.value || '').trim(); let url = buildURL(WEBHOOK_URL, method, bodyRaw); const headersExtra = parseHeadersJSON(); const parts = ['curl', '-i', '-X', JSON.stringify(method), JSON.stringify(url)]; const hdrs = []; if (method !== 'GET' && bodyRaw) { if (looksLikeJSON(bodyRaw)) { hdrs.push('-H', 'Content-Type: application/json'); } else { hdrs.push('-H', 'Content-Type: text/plain; charset=utf-8'); } } Object.entries(headersExtra).forEach(([k, v]) => { hdrs.push('-H', `${k}: ${v}`); }); if (hdrs.length) parts.splice(2, 0, ...hdrs.map(s => (s.startsWith('-H') ? s : JSON.stringify(s)))); if (method !== 'GET' && bodyRaw) { parts.push('--data-binary', JSON.stringify(bodyRaw)); } const cmd = parts.join(' '); navigator.clipboard.writeText(cmd).then(() => setStatus('cURL copiado. Cole no terminal para testar sem CORS.')); });
+
+      // === TESTES AUTOMÁTICOS ===
+      const tests = [
+        { name: 'GET com CORS (jsonplaceholder)', run: async () => { const r = await fetch('https://jsonplaceholder.typicode.com/todos/1'); const j = await r.json(); if (j && j.id === 1 && j.title) return 'PASS'; throw new Error('Conteúdo inesperado'); } },
+        { name: 'POST com CORS (jsonplaceholder)', run: async () => { const r = await fetch('https://jsonplaceholder.typicode.com/posts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'n8n-test', body: 'hello', userId: 1 }) }); const j = await r.json(); if (j && j.id) return 'PASS'; throw new Error('Sem ID criado'); } },
+        { name: 'Seu webhook — preflight/OPTIONS (pode falhar se não suportado)', run: async () => { const r = await fetch(WEBHOOK_URL, { method: 'OPTIONS' }); return `STATUS ${r.status}`; } }
+      ];
+
+      if (RUN_TESTS) RUN_TESTS.addEventListener('click', async () => { if (TESTS_OUT) TESTS_OUT.textContent = 'Executando testes…'; const logs = []; for (const t of tests) { const t0 = performance.now(); try { const res = await t.run(); logs.push(`✔ ${t.name} → ${res} (${Math.round(performance.now() - t0)}ms)`); } catch (e) { logs.push(`✖ ${t.name} → FAIL: ${e.message || e}`); } } if (TESTS_OUT) TESTS_OUT.textContent = logs.join('\n'); });
+
+      // === EFEITOS ===
+      function randomEffect() { const effects = [confettiBurst, emojiExplosion, matrixRainFlash, spinWorld, glitchTitle, fireSparkles, beepChord]; const pick = effects[Math.floor(Math.random() * effects.length)]; pick(); }
+      function subtlePulse() { document.body.animate([{ filter: 'none' }, { filter: 'saturate(2) brightness(1.2)' }, { filter: 'none' }], { duration: 700, easing: 'ease' }); }
+      function shakeScreen() { document.body.animate([{ transform: 'translate(0,0)' }, { transform: 'translate(-6px,0)' }, { transform: 'translate(6px,0)' }, { transform: 'translate(-3px,0)' }, { transform: 'translate(3px,0)' }, { transform: 'translate(0,0)' }], { duration: 400, iterations: 1 }); if (navigator.vibrate) navigator.vibrate(60); }
+
+      function confettiBurst() { const N = 220; const parts = []; for (let i = 0; i < N; i++) { parts.push({ x: Math.random() * overlay.width, y: -20, vx: (Math.random() - .5) * 1.2, vy: Math.random() * 2 + 1, r: Math.random() * 4 + 2, a: Math.random() * Math.PI, life: 120 + Math.random() * 80 }); } let frame = 0; const id = setInterval(() => { frame++; ctx.clearRect(0, 0, overlay.width, overlay.height); for (const p of parts) { p.x += p.vx; p.y += p.vy; p.a += .1; p.vy += 0.02; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = `hsl(${(p.x + p.y) % 360},90%,60%)`; ctx.fillRect(-p.r, -p.r, p.r * 2, p.r * 2 * 0.6); ctx.restore(); p.life--; } if (frame > 240) { clearInterval(id); ctx.clearRect(0, 0, overlay.width, overlay.height); } }, 16); subtlePulse(); }
+      function emojiExplosion() { const EMOJIS = ['🎉', '✨', '🤖', '⚡️', '🌀', '🔥', '🌈', '🧠', '💥', '🎈']; const count = 60 + Math.floor(Math.random() * 40); for (let i = 0; i < count; i++) { const span = document.createElement('span'); span.className = 'emoji'; span.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)]; const x = Math.random() * window.innerWidth; const y = window.innerHeight + 20; span.style.left = x + 'px'; span.style.top = y + 'px'; floatLayer.appendChild(span); const dx = (Math.random() - .5) * 120; const dy = -(80 + Math.random() * 260); const rot = (Math.random() - .5) * 720; const anim = span.animate([{ transform: 'translate(0,0) rotate(0deg)', opacity: 1 }, { transform: `translate(${dx}px,${dy}px) rotate(${rot}deg)`, opacity: 0 }], { duration: 1200 + Math.random() * 800, easing: 'cubic-bezier(.2,.7,.3,1)' }); anim.onfinish = () => span.remove(); } }
+      function matrixRainFlash() { const width = matrixCanvas.width, height = matrixCanvas.height; const fontSize = Math.max(12, Math.floor(16 * DPR)); const columns = Math.floor(width / (fontSize)); const drops = Array(columns).fill(0); let ticks = 0; const glyphs = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポ0123456789'; function step() { ticks++; mctx.fillStyle = 'rgba(0, 0, 0, 0.08)'; mctx.fillRect(0, 0, width, height); mctx.fillStyle = '#0f0'; mctx.font = `${fontSize}px monospace`; for (let i = 0; i < drops.length; i++) { const text = glyphs[Math.floor(Math.random() * glyphs.length)]; const x = i * fontSize; const y = drops[i] * fontSize; mctx.fillText(text, x, y); if (y > height && Math.random() > 0.975) drops[i] = 0; else drops[i]++; } if (ticks > 350) { cancelAnimationFrame(anim); mctx.clearRect(0, 0, width, height); return; } anim = requestAnimationFrame(step); } let anim = requestAnimationFrame(step); }
+      function spinWorld() { document.documentElement.animate([{ filter: 'hue-rotate(0deg) saturate(1)' }, { filter: 'hue-rotate(180deg) saturate(2)' }, { filter: 'hue-rotate(360deg) saturate(1)' }], { duration: 1200, easing: 'ease-in-out' }); document.body.animate([{ transform: 'rotate(0deg) scale(1)' }, { transform: 'rotate(1deg) scale(1.02)' }, { transform: 'rotate(0deg) scale(1)' }], { duration: 900, easing: 'ease-in-out' }); }
+      function glitchTitle() { const keyframes = [{ textShadow: '2px 0 #0ff, -2px 0 #f0f', transform: 'skewX(0deg)' }, { textShadow: '-2px 0 #0ff, 2px 0 #f0f', transform: 'skewX(6deg)' }, { textShadow: '0 0 #0ff, 0 0 #f0f', transform: 'skewX(0deg)' }]; TITLE.animate(keyframes, { duration: 400, iterations: 3 }); }
+      function fireSparkles() { const sparks = []; const originX = overlay.width / 2 + (Math.random() - .5) * overlay.width / 3; const originY = overlay.height / 2 + (Math.random() - .5) * overlay.height / 3; for (let i = 0; i < 140; i++) { const a = Math.random() * Math.PI * 2; const spd = 1.5 + Math.random() * 3.5; sparks.push({ x: originX, y: originY, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd, life: 90 + Math.random() * 60 }); } let f = 0; const loop = () => { f++; ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.fillRect(0, 0, overlay.width, overlay.height); for (const s of sparks) { s.x += s.vx; s.y += s.vy; s.vy += 0.015; s.life--; ctx.beginPath(); ctx.arc(s.x, s.y, 1.2, 0, Math.PI * 2); ctx.fillStyle = `hsl(${(s.x + s.y) % 360},100%,60%)`; ctx.fill(); } if (f > 160) { ctx.clearRect(0, 0, overlay.width, overlay.height); return; } requestAnimationFrame(loop); }; loop(); }
+      function beepChord() { try { const actx = new (window.AudioContext || window.webkitAudioContext)(); const now = actx.currentTime; const freqs = [261.63, 329.63, 392.00].map(f => f * (0.9 + Math.random() * 0.2)); freqs.forEach((f, i) => { const o = actx.createOscillator(); const g = actx.createGain(); o.type = 'sawtooth'; o.frequency.value = f; o.connect(g); g.connect(actx.destination); g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.2, now + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.35 + i * 0.02); o.start(now + i * 0.005); o.stop(now + 0.5 + i * 0.02); }); } catch { } }
+    })();
+  </script>
+</body>
+
+</html>
